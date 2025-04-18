@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Route,BrowserRouter as  Router, Routes, useNavigate } from "react-router-dom";
-import Schedule from "./pages/schedule";
+
+import MainContent from "./MainContent";
+import AddUser from "./pages/AddUser";
+import Schedule from "./pages/Schedule";
 const App = () => {
   const [open, setOpen] = useState(true);
   const [selectedTile, setSelectedTile] = useState("Home Page");
@@ -8,7 +11,7 @@ const App = () => {
   const Menus = [
     { title: "Dashboard", src: "Chart_fill",path:'' },
     { title: "Inbox", src: "Chat" },
-    { title: "Accounts", src: "User", gap: true },
+    { title: "Users", src: "User", gap: true ,path:"/users"},
     { title: "Schedule ", src: "Calendar" ,path:"/schedule"},
     { title: "Search", src: "Search" },
     { title: "Analytics", src: "Chart" },
@@ -22,9 +25,8 @@ const App = () => {
   
     <div className="flex">
       <div
-        className={` ${
-          open ? "w-60" : "w-20 "
-        } bg-purple-700 h-screen p-5  pt-8 relative duration-300`}
+        className={`bg-purple-700 h-screen p-5 pt-8 fixed ${open ? "w-60" : "w-20"}`}
+        
       >
         <img
           src="./src/assets/control.png"
@@ -69,11 +71,15 @@ const App = () => {
       </div>
       <div className="h-screen flex-1 p-7">
  {/* add remaining Routes */}
-     
-        <Routes>
+ <MainContent sidebarOpen={open}>
+     <Routes>
           <Route path="/schedule" element={<Schedule/>}/>
+          <Route path="/users" element={<AddUser/>}/>
           <Route path="/" element={<h1>Welcome to Dashboard</h1>} />
+          
         </Routes>
+        </MainContent>
+        
         
       </div>
     </div>
