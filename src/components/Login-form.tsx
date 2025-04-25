@@ -52,7 +52,7 @@ export default function LoginForm() {
     setOpenSnackbar(false);
   };
   return (
-    <div className="w-full max-w-md bg-white rounded-lg shadow-sm p-8">
+    <div className="w-90 max-w-md bg-white rounded-xl shadow-sm p-8">
       <div className="flex justify-center mb-6">
         <div className="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center">
           <span className="text-purple-500 text-xl font-semibold">M</span>
@@ -63,9 +63,9 @@ export default function LoginForm() {
 
       <div className="text-center text-sm text-gray-600 mb-6">
         Don&apos;t have an account?{" "}
-        <Link href="/signup" className="text-purple-500 hover:text-purple-600">
+        <a href="/signup" className="text-purple-500 hover:text-purple-600">
           Get started
-        </Link>
+        </a>
       </div>
 
       <form className="space-y-4">
@@ -81,15 +81,16 @@ export default function LoginForm() {
             <label htmlFor="password" className="text-sm text-gray-700">
               Password
             </label>
-            <Link href="/forgot-password" className="text-sm text-gray-600 hover:text-gray-900">
+            <a href="/forgot-password" className="text-xs text-gray-600 hover:text-gray-900">
               Forgot password?
-            </Link>
+            </a>
           </div>
           <div className="relative">
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
               className="w-full border-gray-300 pr-10"
+              sx={{width: '100%',paddingRight:'10px'}}
               placeholder="6+ characters"
               name="password"
               value={password}
@@ -106,7 +107,14 @@ export default function LoginForm() {
           </div>
         </div>
 
-        <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white" onClick={handleSubmit}>Sign in</Button>
+        <Button sx={{
+          // "w-full bg-gray-900 hover:bg-gray-800 text-white"
+          width: '100%',
+          backgroundColor: 'grey.900',
+          color:'white',
+        '&:hover':{
+          backgroundColor:'grey.800'
+        }}} onClick={handleSubmit}>Sign in</Button>
       </form>
       <Snackbar
         open={openSnackbar}

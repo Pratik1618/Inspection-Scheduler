@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Route, BrowserRouter as Router, Routes, useLocation, useNavigate } from "react-router-dom";
 
 import MainContent from "./MainContent";
@@ -6,9 +6,11 @@ import AddUser from "./pages/AddUser";
 import Schedule from "./pages/Schedule";
 import AddClient from "./pages/AddClient";
 import Login from "./pages/Login";
+import { jwtDecode } from 'jwt-decode'
 const App = () => {
   const [open, setOpen] = useState(true);
   const [selectedTile, setSelectedTile] = useState("Home Page");
+  const [role, setRole] = useState(null); // Default role
   const navigate = useNavigate();
   const location = useLocation();
   const Menus = [
@@ -22,17 +24,48 @@ const App = () => {
     { title: "Analytics", src: "Chart" },
     { title: "Files ", src: "Folder", gap: true },
     { title: "Setting", src: "Setting" },
+    { title: "Inspection", src: "Inspection", path: "/inspection" }, // New tab for Technician
+    { title: "Installation", src: "Installation", path: "/installation" },
   ];
   const isLoginPage = location.pathname === "/login";
   const logout = () => {
     console.log("click")
     localStorage.removeItem("token");
+    setRole(null);
     navigate("/login");
+    window.location.reload();
   }
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        setRole(decodedToken.role)
+        console.log(decodedToken.role);
+      } catch (error) {
+        console.error("Invalid token:", error);
+      }
+    }
+  });
+
+  const filteredMenus = Menus.filter((menu) => {
+    if (role === 'technician') {
+      return (
+        menu.title === "Dashboard" ||
+        menu.title === "Inbox" ||
+        menu.title === "Inspection" ||
+        menu.title === "Installation" ||
+        menu.title === 'Settings'
+      );
+    }
+    if (role === 'admin') {
+      return menu.title !== "Inspection" &&
+        menu.title !== "Installation" ;
+    }
+    return true
+  })
   return (
-
-
-
     <div className="flex">
       {!isLoginPage && (
         <div
@@ -47,7 +80,7 @@ const App = () => {
           />
           <div className="flex gap-x-4 items-center">
             <img
-            onClick={logout}
+              onClick={logout}
               src="./src/assets/logo.png"
               className={`cursor-pointer duration-500 ${open && "rotate-[360deg]"
                 }`}
@@ -60,7 +93,7 @@ const App = () => {
             </h1>
           </div>
           <ul className="pt-6">
-            {Menus.map((Menu, index) => (
+            {filteredMenus.map((Menu, index) => (
               <li
                 key={index}
                 className={`flex  rounded-md p-2 cursor-pointer hover:bg-stone-200/50 text-gray-300 text-sm items-center gap-x-4 
