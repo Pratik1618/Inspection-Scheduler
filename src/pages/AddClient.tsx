@@ -100,7 +100,12 @@ console.log(anagaram('oppo','poop'));
         }
 
         try {
-            const response = await axios.post('http://localhost:5000/createClient', formData)
+            const token = localStorage.getItem('token');
+            const response = await axios.post('http://localhost:5000/createClient', formData,{
+                headers:{
+                    Authorization : `Bearer ${token}`
+                }
+            })
             fetchClients();
             setFormData({
                 clientName: ''

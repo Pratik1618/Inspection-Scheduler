@@ -33,6 +33,7 @@ export default function LoginForm() {
       const response = await axios.post('http://localhost:5000/login', { email, password })
       if (response.status === 200) {
         navigate('/dashboard')
+        localStorage.setItem('token', response.data.token)
       } else {
         console.log(response.data.message)
       }
