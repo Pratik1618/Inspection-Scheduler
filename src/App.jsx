@@ -4,7 +4,8 @@ import { Route,BrowserRouter as  Router, Routes, useNavigate } from "react-route
 import MainContent from "./MainContent";
 import AddUser from "./pages/AddUser";
 import Schedule from "./pages/Schedule";
-import AddClient from "./pages/addClient";
+import AddClient from "./pages/AddClient";
+import Login from "./pages/Login";
 const App = () => {
   const [open, setOpen] = useState(true);
   const [selectedTile, setSelectedTile] = useState("Home Page");
@@ -21,12 +22,13 @@ const App = () => {
     { title: "Files ", src: "Folder", gap: true },
     { title: "Setting", src: "Setting" },
   ];
-
+  const isLoginPage = location.pathname === "/login";
   return (
 
 
-  
+ 
     <div className="flex">
+       {!isLoginPage && (
       <div
         className={`bg-purple-700 h-screen p-5 pt-8 fixed ${open ? "w-60" : "w-20"}`}
         
@@ -72,8 +74,11 @@ const App = () => {
           ))}
         </ul>
       </div>
-      <div className="h-screen flex-1 p-7">
+    )}
+
+      <div className={`h-screen flex-1 ${isLoginPage ? '' : 'p-7'}`}>
  {/* add remaining Routes */}
+ {!isLoginPage ? ( 
  <MainContent sidebarOpen={open}>
      <Routes>
           <Route path="/schedule" element={<Schedule/>}/>
@@ -83,8 +88,12 @@ const App = () => {
           
         </Routes>
         </MainContent>
+ ):(
+        <Routes>
+          <Route path='/login' element={<Login/>}/>
+        </Routes>
         
-        
+)}  
       </div>
     </div>
 

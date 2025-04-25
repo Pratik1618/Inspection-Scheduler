@@ -9,12 +9,12 @@ import Box from '@mui/material/Box';
 import axios from 'axios';
 
 
-interface FormData{
-    name:string,
-    role:string,
-    number:number|"",
-    password:string,
-    email:string
+interface FormData {
+    name: string,
+    role: string,
+    number: number | "",
+    password: string,
+    email: string
 }
 
 interface Role {
@@ -38,7 +38,7 @@ const columns = [
         }
     }
 ];
-const roles:Role[] = [
+const roles: Role[] = [
     { value: 'admin', label: 'Admin' },
     { value: 'technician', label: 'Technician' },
     { value: 'store_manager', label: 'Store Manager' },
@@ -49,74 +49,74 @@ const roles:Role[] = [
 
 
 
-const AddUser:React.FC = () => {
+const AddUser: React.FC = () => {
     const [users, setUsers] = useState<any[]>([]);
     const [error, setError] = useState<string>('')
-const [formData,setFormData]= useState<FormData>({
-    name:'',
-    role:'',
-    email:'',
-    number:"",
-    password:''
-})
+    const [formData, setFormData] = useState<FormData>({
+        name: '',
+        role: '',
+        email: '',
+        number: "",
+        password: ''
+    })
 
-const handleChange =(e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>|  SelectChangeEvent<unknown>)=>{
-const {name,value} = e.target;
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<unknown>) => {
+        const { name, value } = e.target;
 
-setFormData((prevState)=>({
-    ...prevState,
-    [name as string]:name ===  'number' ? parseInt(value as string) || '' : value,
-}));
-}
-
-useEffect(() => {
-    fetchUsers();
-}, []);
-
-const fetchUsers = async () => {
-    try {
-        const response = await axios.get('http://localhost:5000/users');
-        setUsers(response.data); // assuming API returns array of users
-    } catch (error) {
-        console.error('Failed to fetch users:', error);
+        setFormData((prevState) => ({
+            ...prevState,
+            [name as string]: name === 'number' ? parseInt(value as string) || '' : value,
+        }));
     }
-};
 
-const handleSubmit= async ()=>{
+    useEffect(() => {
+        fetchUsers();
+    }, []);
 
-    if(!formData.name || !formData.role || !formData.email || !formData.number || !formData.password) {
-        alert("Please fill all the fields");
-        return;
-    }
-    try{
-        const response = await axios.post('http://localhost:5000/register', formData);
-        console.log("formdataon sun",formData);
-        setFormData({
-            name: '',
-            role: '',
-            email: '',
-            number: "",
-            password: '',
-          });
-
-          setError('')
-          fetchUsers();
-    }
-    catch (error: any) {
-        console.error("Error submitting form", error);
-        
-        if (error.response?.data?.errors) {
-          // Handle array of validation errors
-          setError(error.response.data.errors.join(', '));
-        } else if (error.response?.data?.message) {
-          // Handle single error message
-          setError(error.response.data.message);
-        } else {
-          setError('An unexpected error occurred');
+    const fetchUsers = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/users');
+            setUsers(response.data); // assuming API returns array of users
+        } catch (error) {
+            console.error('Failed to fetch users:', error);
         }
-      }
-  
-}
+    };
+
+    const handleSubmit = async () => {
+
+        if (!formData.name || !formData.role || !formData.email || !formData.number || !formData.password) {
+            alert("Please fill all the fields");
+            return;
+        }
+        try {
+            const response = await axios.post('http://localhost:5000/register', formData);
+            console.log("formdataon sun", formData);
+            setFormData({
+                name: '',
+                role: '',
+                email: '',
+                number: "",
+                password: '',
+            });
+
+            setError('')
+            fetchUsers();
+        }
+        catch (error: any) {
+            console.error("Error submitting form", error);
+
+            if (error.response?.data?.errors) {
+                // Handle array of validation errors
+                setError(error.response.data.errors.join(', '));
+            } else if (error.response?.data?.message) {
+                // Handle single error message
+                setError(error.response.data.message);
+            } else {
+                setError('An unexpected error occurred');
+            }
+        }
+
+    }
     return (
         <div>
             <h1 className="text-2xl font-semibold ">Users</h1>
@@ -155,7 +155,7 @@ const handleSubmit= async ()=>{
                             <StyledTextField
                                 name='number'
                                 label="PHONE NUMBER"
-                                 type="number"
+                                type="number"
                                 value={formData.number}
                                 onChange={handleChange}
                             >
@@ -197,7 +197,7 @@ const handleSubmit= async ()=>{
                     )}
                     <Grid size={3}>
                         <Button variant="contained" color="primary" sx={{ height: '40px', fontSize: '0.875rem' }}
-                                onClick={handleSubmit}>
+                            onClick={handleSubmit}>
                             ADD
                         </Button>
                     </Grid>
@@ -211,7 +211,7 @@ const handleSubmit= async ()=>{
                 </Grid>
 
                 <Box sx={{ height: 400, width: '100%', mt: 2 }}>
-                    <DataGrid columns={columns} rows={users} getRowId={(row)=>row._id}></DataGrid>
+                    <DataGrid columns={columns} rows={users} getRowId={(row) => row._id}></DataGrid>
                 </Box>
             </Container>
         </div>

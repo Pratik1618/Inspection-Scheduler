@@ -22,6 +22,48 @@ const Columns = [
     }
 ]
 const AddClient: React.FC = () => {
+
+    function maxNum(arr){
+        let max = arr[0];
+        for(let i=0;i<arr.length;i++){
+            if(arr[i]>max){
+                max=arr[i]
+              
+            }
+
+        }
+        return max;
+    }
+    console.log(maxNum([1,2,3,4,5]));
+
+    function minNum(arr){
+
+        let min = arr[0];
+        for(let i=0;i<arr.length;i++){
+            if(arr[i]<min){
+                min=arr[i]
+            }
+        };
+        return min;
+    }
+    console.log(minNum([1,2,3,4,5]));
+function reverse(str:string){
+    return str.split('').reverse().join('')
+}
+console.log(reverse(`oppo`));
+
+function palindrome(str){
+    const reversed = str.split('').reverse().join('');
+    return str === reversed;
+}
+function anagaram(str1,str2){
+    const sortedStr1 = str1.split('').sort().join('');
+    const sortedStr2 = str2.split('').sort().join('');
+    return sortedStr1 === sortedStr2;
+}
+console.log(palindrome('oppo'));
+console.log(anagaram('oppo','poop'));
+
     const [client,setClient] = useState<any[]>([]);
 
     const [formData, setFormData] = useState<FormData>({
@@ -67,6 +109,7 @@ const AddClient: React.FC = () => {
         }
         catch (error: any) {
             console.log(error, 'error');
+            alert(error.response.data.message)
         }
     }
     return (
