@@ -41,8 +41,8 @@ const columns = [
 const roles: Role[] = [
     { value: 'admin', label: 'Admin' },
     { value: 'technician', label: 'Technician' },
-    { value: 'store_manager', label: 'Store Manager' },
-    { value: 'zonal_manager', label: 'Zonal Manager' },
+    { value: 'storeManager', label: 'Store Manager' },
+    { value: 'zonalManager', label: 'Zonal Manager' },
 ];
 
 

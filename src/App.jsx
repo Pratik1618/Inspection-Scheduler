@@ -3,10 +3,11 @@ import { Route, BrowserRouter as Router, Routes, useLocation, useNavigate } from
 
 import MainContent from "./MainContent";
 import AddUser from "./pages/AddUser";
-import Schedule from "./pages/Schedule";
+import Schedule from "./components/ScheduleComponent";
 import AddClient from "./pages/AddClient";
 import Login from "./pages/Login";
 import { jwtDecode } from 'jwt-decode'
+import AddStore from "./pages/AddStore";
 const App = () => {
   const [open, setOpen] = useState(true);
   const [selectedTile, setSelectedTile] = useState("Home Page");
@@ -19,6 +20,7 @@ const App = () => {
     { title: "Inbox", src: "Chat" },
     { title: "Users", src: "User", gap: true, path: "/users" },
     { title: "Clients", src: "User", path: "/clients" },
+    {title:"Store",src:"Store",path:"/store"},
 
     { title: "Search", src: "Search" },
     { title: "Analytics", src: "Chart" },
@@ -38,13 +40,23 @@ const App = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const currentPath = location.pathname
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
         setRole(decodedToken.role)
         console.log(decodedToken.role);
+        if(currentPath === '/login') {
+          navigate('/');
+        }
       } catch (error) {
         console.error("Invalid token:", error);
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
+    }else{
+      if(currentPath !== '/login') {
+        navigate("/login");
       }
     }
   });
@@ -123,6 +135,7 @@ const App = () => {
               <Route path="/schedule" element={<Schedule />} />
               <Route path="/users" element={<AddUser />} />
               <Route path="/clients" element={<AddClient />} />
+              <Route path="/store" element={<AddStore />} />
               <Route path="/" element={<h1>Welcome to Dashboard</h1>} />
 
             </Routes>
