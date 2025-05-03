@@ -4,7 +4,6 @@ import { StyledInputLabel, StyledSelect, StyledTextField } from './styledCompone
 import { DataGrid } from '@mui/x-data-grid'
 import axios from 'axios'
 import api from '../constant/server'
-import { Trophy } from 'lucide-react'
 
 
 interface FormData {
@@ -29,16 +28,16 @@ interface StoreManager{
     role:string
 }
 const Columnns = [
-    { field: 'clientName', headerName: 'Client Name',flex:1},
-    { field: 'name', headerName: 'Store Name' ,flex:1},
-    { field: 'address', headerName: 'Address' ,flex:1},
-    { field: 'zipcode', headerName: 'Zipcode', flex:1},
+    { field: 'clientName', headerName: 'Client Name',width:140},
+    { field: 'name', headerName: 'Store Name' ,width:140},
+    { field: 'address', headerName: 'Address' ,width:140},
+    { field: 'zipcode', headerName: 'Zipcode' ,width:140},
 
-    { field: 'city', headerName: 'City' },
-    { field: 'state', headerName: 'State' },
-    {field:'storeManagerId',headerName:'Store Manager',},
+    { field: 'city', headerName: 'City' ,width:140},
+    { field: 'state', headerName: 'State' ,width:140},
+    {field:'storeManagerName',headerName:'Store Manager',width:140},
     {
-        field: 'actions', headerName: 'Actions',renderCell: (params) => {
+        field: 'actions', headerName: 'Actions',width:150,renderCell: (params) => {
             return (
                 <div className="flex gap-2 mt-2" >
                     <Button variant="contained" color="primary" size="small">Edit</Button>
@@ -50,6 +49,7 @@ const Columnns = [
 ]
 
 const AddStoreComponent: React.FC = () => {
+    
 
     const url = api().baseUrl;
     const [stores, setStores] = useState<any[]>([])
@@ -73,8 +73,14 @@ const AddStoreComponent: React.FC = () => {
     const fetchStores = async () => {
         try {
             const response = await axios.get(`${url}/stores`);
-
-            setStores(response.data);
+            const formattedData = response.data.map((store: any) => ({
+                ...store,
+                clientName: store.clientId?.clientName || 'N/A',
+                storeManagerName: store.storeManagerId?.name || 'N/A',
+                
+            }));
+            setStores(formattedData);
+            console.log(formattedData, 'formattedData')
         }catch (error) {
             console.error('Error fetching stores:', error);
         }
@@ -139,6 +145,7 @@ const fetchStoreManagers = async ()=>{
         
 
     });
+    console.log(stores)
     return (
         <div>
             <h1 className="text-2xl font-semibold ">Add Store</h1>
@@ -279,7 +286,7 @@ const fetchStoreManagers = async ()=>{
                     <h2 className="text-xl font-semibold">User List</h2>
                 </Grid>
 
-                <Box sx={{ height: 400, width: '100%', mt: 2 }}>
+                <Box sx={{ height: '100%', width: '100%', mt: 2 }}>
                     <DataGrid columns={Columnns} rows={stores} getRowId={(row) => row._id}></DataGrid>
                 </Box>
             </Container>

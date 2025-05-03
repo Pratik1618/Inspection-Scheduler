@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { Button, Container, FormControl, Grid, InputLabel, MenuItem, Select, styled, TextField } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import { Button, Container, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, styled, TextField } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -7,6 +7,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import axios from 'axios';
 import { StyledDatePicker, StyledInputLabel, StyledSelect } from './styledComponents';
+import store from '../../../Scheduler-Backend/model/store';
 
 const columns = [
   { field: 'id', headerName: 'Ticket No', width: 120 },
@@ -34,7 +35,7 @@ const columns = [
 ];
 
 interface Technician {
-  id: number,
+  _id: number,
   name: string,
   email: string,
   phone: string,
@@ -118,22 +119,70 @@ const scheduleFor: ScheduleFor[] = [
 
 const ScheduleComponent: React.FC = () => {
   const [technician, setTechnician] = React.useState<Technician[]>([])
-
+  const [clients, setClients] = useState<any[]>([]);  // Update according to your client data structure
+  const [stores, setStores] = useState<any[]>([]);
+  const [selectedClient, setSelectedClient] = useState('');
+  const [selectedStore, setSelectedStore] = useState('');
+  const [scheduleType, setScheduleType] = useState('');
+  const [scheduleDate, setScheduleDate] = useState<any>(null);
+  const [selectedTechnician, setSelectedTechnician] = useState('');
   useEffect(() => {
+    // Fetch technicians
     const fetchTechnicians = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/users')
-
-        const technician = response.data.filter((user: Technician) => user.role === 'technician')
-
-        setTechnician(technician)
-
+        const response = await axios.get('http://localhost:5000/users');
+        const technician = response.data.filter((user: Technician) => user.role === 'technician');
+        setTechnician(technician);
       } catch (error) {
-        console.error('Error fetching technicians:', error)
+        console.error('Error fetching technicians:', error);
       }
     };
+
+    // Fetch clients and stores
+    const fetchClientsAndStores = async () => {
+      try {
+        const clientResponse = await axios.get('http://localhost:5000/clients');  // Endpoint to fetch clients
+        setClients(clientResponse.data);
+
+        // Fetch stores for each client
+        const storeResponse = await axios.get('http://localhost:5000/stores');  // Endpoint to fetch stores
+        setStores(storeResponse.data);
+       
+      } catch (error) {
+        console.error('Error fetching clients or stores:', error);
+      }
+    };
+
     fetchTechnicians();
-  }, [])
+    fetchClientsAndStores();
+  }, []);
+  console.log(stores)
+console.log(selectedTechnician)
+  console.log(selectedClient)
+
+  const handleChange = (event: React.ChangeEvent<{name:unknown; value: unknown }> | SelectChangeEvent<unknown>) => {
+    const { name, value } = event.target;
+
+  switch (name) {
+    case 'client':
+      setSelectedClient(value as string);
+      break;
+    case 'storeId':
+      setSelectedStore(value as string);
+      break;
+    case 'scheduleFor':
+      setScheduleType(value as string);
+      break;
+    case 'technician':
+      setSelectedTechnician(value as string);
+      break;
+    case 'scheduleDate':
+      setScheduleDate(value);
+      break;
+    default:
+      break;
+  }
+  };
   return (
     <div>
       <h1 className="text-2xl font-semibold ">Schedule</h1>
@@ -146,8 +195,14 @@ const ScheduleComponent: React.FC = () => {
               <StyledSelect
                 name='client'
                 label="Client"
+                value={selectedClient}
+                onChange={handleChange}
               >
-
+                {clients.map((client) => (
+                  <MenuItem key={client._id} value={client.clientName}>
+                    {client.clientName}
+                  </MenuItem>
+                ))}
               </StyledSelect>
             </FormControl>
           </Grid>
@@ -155,10 +210,17 @@ const ScheduleComponent: React.FC = () => {
             <FormControl fullWidth>
               <StyledInputLabel>Store Name</StyledInputLabel>
               <StyledSelect
-                name='client'
+                name='storeId'
                 label="Store Name"
+                value={selectedStore}
+                onChange={handleChange}
               >
-
+                {stores
+                .map((store)=>(
+                  <MenuItem key={store._id} value={store._id}>
+                    {store.name}
+                  </MenuItem>
+                ))}
               </StyledSelect>
             </FormControl>
           </Grid>
@@ -166,8 +228,10 @@ const ScheduleComponent: React.FC = () => {
             <FormControl fullWidth>
               <StyledInputLabel>Schedule For</StyledInputLabel>
               <StyledSelect
-                name='client'
+                name='scheduleFor'
                 label="Schedule For"
+                value={scheduleType}
+                onChange={handleChange}
               >
                 {
                   scheduleFor.map((option) => (
@@ -183,11 +247,13 @@ const ScheduleComponent: React.FC = () => {
             <FormControl fullWidth>
               <StyledInputLabel>Technician Name</StyledInputLabel>
               <StyledSelect
-                name='client'
+                name='technician'
                 label="Technician Name"
+                value={selectedTechnician}
+                onChange={handleChange}
               >
                 {technician.map((tech) => (
-                  <MenuItem key={tech.id} value={tech.name}>
+                  <MenuItem key={tech._id} value={tech._id}>
                     {tech.name}
                   </MenuItem>
                 ))}
@@ -197,7 +263,13 @@ const ScheduleComponent: React.FC = () => {
           <Grid size={3}>
             <FormControl fullWidth>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <StyledDatePicker></StyledDatePicker>
+                <StyledDatePicker
+                  name='scheduleDate'
+                  value={scheduleDate}
+                
+                  >
+
+                </StyledDatePicker>
               </LocalizationProvider>
             </FormControl>
           </Grid>
