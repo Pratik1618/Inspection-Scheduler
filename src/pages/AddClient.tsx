@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { StyledTextField } from '../components/styledComponents'
 import { DataGrid } from '@mui/x-data-grid'
 import axios from 'axios'
+import api from '../constant/server'
 
 interface FormData {
     clientName: string,
@@ -22,7 +23,7 @@ const Columns = [
     }
 ]
 const AddClient: React.FC = () => {
-
+const url = api().baseUrl
     function maxNum(arr){
         let max = arr[0];
         for(let i=0;i<arr.length;i++){
@@ -76,7 +77,7 @@ console.log(anagaram('oppo','poop'));
 
     const fetchClients = async () => {
         try{
-            const response = await axios.get('http://localhost:5000/clients');
+            const response = await axios.get(`${url}/clients`);
             
             setClient(response.data)
         }catch(error){
@@ -101,7 +102,7 @@ console.log(anagaram('oppo','poop'));
 
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post('http://localhost:5000/createClient', formData,{
+            const response = await axios.post(`${url}/createClient`, formData,{
                 headers:{
                     Authorization : `Bearer ${token}`
                 }

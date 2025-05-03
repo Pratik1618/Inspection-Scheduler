@@ -27,7 +27,7 @@ const App = () => {
     { title: "Files ", src: "Folder", gap: true },
     { title: "Setting", src: "Setting" },
     { title: "Inspection", src: "Inspection", path: "/inspection" }, // New tab for Technician
-    { title: "Installation", src: "Installation", path: "/installation" },
+    { title: "Installation", src: "tools", path: "/installation" },
   ];
   const isLoginPage = location.pathname === "/login";
   const logout = () => {

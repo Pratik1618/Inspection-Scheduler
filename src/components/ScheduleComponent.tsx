@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Container, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, styled, TextField } from '@mui/material'
+import { Button, Container, FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, Snackbar, styled, TextField } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
@@ -11,6 +11,7 @@ import store from '../../../Scheduler-Backend/model/store';
 import dayjs, { Dayjs } from 'dayjs';
 import { set } from 'mongoose';
 import { Store } from 'lucide-react';
+import api from '../constant/server';
 
 const columns = [
   { field: 'ticketNo', headerName: 'Ticket No', width: 120 },
@@ -77,6 +78,7 @@ const scheduleFor: ScheduleFor[] = [
 
 
 const ScheduleComponent: React.FC = () => {
+  const url = api().baseUrl
   const [technician, setTechnician] = React.useState<Technician[]>([])
   const [clients, setClients] = useState<any[]>([]);
   const [stores, setStores] = useState<any[]>([]);
@@ -85,13 +87,15 @@ const ScheduleComponent: React.FC = () => {
   const [scheduleType, setScheduleType] = useState('');
   const [scheduleDate, setScheduleDate] = useState<any>(null);
   const [selectedTechnician, setSelectedTechnician] = useState('');
-  
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [message, setMessage] = useState('');
   const [schedule, setSchedule] = useState<any[]>([]);
+
   useEffect(() => {
     // Fetch technicians
     const fetchTechnicians = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/users');
+        const response = await axios.get(`${url}/users`);
         const technician = response.data.filter((user: Technician) => user.role === 'technician');
         setTechnician(technician);
       } catch (error) {
@@ -102,23 +106,23 @@ const ScheduleComponent: React.FC = () => {
 
     const fetchClientsAndStores = async () => {
       try {
-        const clientResponse = await axios.get('http://localhost:5000/clients');
+        const clientResponse = await axios.get(`${url}/clients`);
         setClients(clientResponse.data);
 
-        const storeResponse = await axios.get('http://localhost:5000/stores');
+        const storeResponse = await axios.get(`${url}/stores`);
         setStores(storeResponse.data)
-       
-      
-       
+
+
+
 
       } catch (error) {
         console.error('Error fetching clients or stores:', error);
       }
     };
-    
-console.log(stores,'stores')
 
-   
+    console.log(stores, 'stores')
+
+
     fetchSchedule();
     fetchTechnicians();
     fetchClientsAndStores();
@@ -127,16 +131,16 @@ console.log(stores,'stores')
 
   const fetchSchedule = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/schedules');
+      const response = await axios.get(`${url}/schedules`);
       const formattedData = response.data.map((schedule: any) => ({
         ...schedule,
-        clientName :schedule.storeId.clientId.clientName || 'N/A',
+        clientName: schedule.storeId.clientId.clientName || 'N/A',
         storeName: schedule.storeId.name || 'N/A',
         storeCode: schedule.storeId.storeCode || 'N/A',
         scheduleFor: schedule.scheduleType || 'N/A',
-        technicianName:schedule.technicianId.name || 'N/A',
-        email:schedule.technicianId.email || 'N/A',
-        phone :schedule.technicianId.number || 'N/A',
+        technicianName: schedule.technicianId.name || 'N/A',
+        email: schedule.technicianId.email || 'N/A',
+        phone: schedule.technicianId.number || 'N/A',
         scheduleDate: dayjs(schedule.scheduleDate).format('YYYY-MM-DD'),
 
       }))
@@ -174,18 +178,31 @@ console.log(stores,'stores')
 
   const handleSubmit = async () => {
     try {
-      await axios.post('http://localhost:5000/createSchedule', {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${url}/createSchedule`, {
         scheduleType,
         storeId: selectedStore,
         technicianId: selectedTechnician,
         scheduleDate: scheduleDate
-      })
+      },{
+        headers:{
+          Authorization : `Bearer ${token}`
+        }
+      },)
+
+      setMessage(response.data.message);
+      setOpenSnackbar(true);
     } catch (error) {
       console.error('Error scheduling:', error);
-    }
+      setMessage(error.response.data.message)
+      setOpenSnackbar(true);
 
+    }
     fetchSchedule();
   }
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
   return (
     <div>
       <h1 className="text-2xl font-semibold ">Schedule</h1>
@@ -294,6 +311,13 @@ console.log(stores,'stores')
           <DataGrid columns={columns} rows={schedule} getRowId={(row) => row._id} ></DataGrid>
         </Box>
       </Container>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        message={message}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      />
     </div>
   )
 }
