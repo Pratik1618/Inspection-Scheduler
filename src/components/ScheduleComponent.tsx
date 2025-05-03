@@ -8,19 +8,22 @@ import Box from '@mui/material/Box';
 import axios from 'axios';
 import { StyledDatePicker, StyledInputLabel, StyledSelect } from './styledComponents';
 import store from '../../../Scheduler-Backend/model/store';
+import dayjs, { Dayjs } from 'dayjs';
+import { set } from 'mongoose';
+import { Store } from 'lucide-react';
 
 const columns = [
-  { field: 'id', headerName: 'Ticket No', width: 120 },
-  { field: 'zone', headerName: 'Zone', width: 150 },
-  { field: 'ClientName', headerName: 'Client', width: 150 },
-  { field: 'StoreName', headerName: 'Store Name', width: 200 },
-  { field: 'StoreCode', headerName: 'Store Code', width: 150 },
+  { field: 'ticketNo', headerName: 'Ticket No', width: 120 },
+
+  { field: 'clientName', headerName: 'Client', width: 150 },
+  { field: 'storeName', headerName: 'Store Name', width: 200 },
+  { field: 'storeCode', headerName: 'Store Code', width: 150 },
   { field: 'scheduleFor', headerName: 'Schedule For', width: 150 },
-  { field: 'TechnicianName', headerName: 'Technician Name', width: 200 },
+  { field: 'technicianName', headerName: 'Technician Name', width: 200 },
   { field: 'email', headerName: 'Email', width: 220 },
-  { field: 'Phone', headerName: 'Phone', width: 150 },
-  { field: 'ScheduleDate', headerName: 'Schedule Date', width: 160 },
-  { field: 'Status', headerName: 'Status', width: 140 },
+  { field: 'phone', headerName: 'Phone', width: 150 },
+  { field: 'scheduleDate', headerName: 'Schedule Date', width: 160 },
+  { field: 'status', headerName: 'Status', width: 140 },
   {
     field: 'Action', headerName: 'Action', width: 150,
     renderCell: (params) => {
@@ -60,55 +63,11 @@ interface RowData {
   ScheduleDate: string;
   Status: string;
 }
-const rows = [
-  {
-    id: 1,
-    zone: 'North',
-    ClientName: 'ABC Corp',
-    StoreName: 'Main Street Outlet',
-    StoreCode: 'MS001',
-    scheduleFor: 'Installation',
-    TechnicianName: 'John Doe',
-    email: 'john@example.com',
-    Phone: '123-456-7890',
-    ScheduleDate: '2025-04-20',
-    Status: 'Scheduled',
-  },
-  {
-    id: 2,
-    zone: 'South',
-    ClientName: 'XYZ Ltd',
-    StoreName: 'Downtown Plaza',
-    StoreCode: 'DP002',
-    scheduleFor: 'Maintenance',
-    TechnicianName: 'Jane Smith',
-    email: 'jane@example.com',
-    Phone: '987-654-3210',
-    ScheduleDate: '2025-04-22',
-    Status: 'In Progress',
-  },
-  {
-    id: 3,
-    zone: 'West',
-    ClientName: 'Techtronix',
-    StoreName: 'Westside Store',
-    StoreCode: 'WS003',
-    scheduleFor: 'Repair',
-    TechnicianName: 'Ali Khan',
-    email: 'ali@example.com',
-    Phone: '555-123-4567',
-    ScheduleDate: '2025-04-25',
-    Status: 'Completed',
-  },
-];
+
 
 const scheduleFor: ScheduleFor[] = [
-  { value: 'inspection1', label: 'Inspection-1' },
-  { value: 'inspection2', label: 'Inspection-2' },
-  { value: 'ppmMonthly', label: 'PPM Monthly' },
-  { value: 'ppmQuarterly', label: 'PPM Quarterly' },
-  { value: 'ppmHalfYearly', label: 'PPM Half Yearly' },
-  { value: 'ppmYearly', label: 'PPM Yearly' },
+  { value: 'inspection', label: 'Inspection' },
+  { value: 'ppm', label: 'PPM' },
   { value: 'breakdown', label: 'Breakdown' },
   { value: 'installation', label: 'Installation' },
 
@@ -119,13 +78,15 @@ const scheduleFor: ScheduleFor[] = [
 
 const ScheduleComponent: React.FC = () => {
   const [technician, setTechnician] = React.useState<Technician[]>([])
-  const [clients, setClients] = useState<any[]>([]);  // Update according to your client data structure
+  const [clients, setClients] = useState<any[]>([]);
   const [stores, setStores] = useState<any[]>([]);
   const [selectedClient, setSelectedClient] = useState('');
   const [selectedStore, setSelectedStore] = useState('');
   const [scheduleType, setScheduleType] = useState('');
   const [scheduleDate, setScheduleDate] = useState<any>(null);
   const [selectedTechnician, setSelectedTechnician] = useState('');
+  
+  const [schedule, setSchedule] = useState<any[]>([]);
   useEffect(() => {
     // Fetch technicians
     const fetchTechnicians = async () => {
@@ -138,51 +99,93 @@ const ScheduleComponent: React.FC = () => {
       }
     };
 
-    // Fetch clients and stores
+
     const fetchClientsAndStores = async () => {
       try {
-        const clientResponse = await axios.get('http://localhost:5000/clients');  // Endpoint to fetch clients
+        const clientResponse = await axios.get('http://localhost:5000/clients');
         setClients(clientResponse.data);
 
-        // Fetch stores for each client
-        const storeResponse = await axios.get('http://localhost:5000/stores');  // Endpoint to fetch stores
-        setStores(storeResponse.data);
+        const storeResponse = await axios.get('http://localhost:5000/stores');
+        setStores(storeResponse.data)
        
+      
+       
+
       } catch (error) {
         console.error('Error fetching clients or stores:', error);
       }
     };
+    
+console.log(stores,'stores')
 
+   
+    fetchSchedule();
     fetchTechnicians();
     fetchClientsAndStores();
   }, []);
-  console.log(stores)
-console.log(selectedTechnician)
-  console.log(selectedClient)
 
-  const handleChange = (event: React.ChangeEvent<{name:unknown; value: unknown }> | SelectChangeEvent<unknown>) => {
+
+  const fetchSchedule = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/schedules');
+      const formattedData = response.data.map((schedule: any) => ({
+        ...schedule,
+        clientName :schedule.storeId.clientId.clientName || 'N/A',
+        storeName: schedule.storeId.name || 'N/A',
+        storeCode: schedule.storeId.storeCode || 'N/A',
+        scheduleFor: schedule.scheduleType || 'N/A',
+        technicianName:schedule.technicianId.name || 'N/A',
+        email:schedule.technicianId.email || 'N/A',
+        phone :schedule.technicianId.number || 'N/A',
+        scheduleDate: dayjs(schedule.scheduleDate).format('YYYY-MM-DD'),
+
+      }))
+      setSchedule(formattedData);
+    } catch (error) {
+      console.error('Error fetching schedule:', error);
+    }
+  }
+
+  const filterdStores = stores.filter((store) => store.clientId.clientName === selectedClient);
+  const handleChange = (event: React.ChangeEvent<{ name: unknown; value: unknown }> | SelectChangeEvent<unknown>) => {
     const { name, value } = event.target;
 
-  switch (name) {
-    case 'client':
-      setSelectedClient(value as string);
-      break;
-    case 'storeId':
-      setSelectedStore(value as string);
-      break;
-    case 'scheduleFor':
-      setScheduleType(value as string);
-      break;
-    case 'technician':
-      setSelectedTechnician(value as string);
-      break;
-    case 'scheduleDate':
-      setScheduleDate(value);
-      break;
-    default:
-      break;
-  }
+    switch (name) {
+      case 'client':
+        setSelectedClient(value as string);
+        break;
+      case 'storeId':
+        setSelectedStore(value as string);
+        break;
+      case 'scheduleFor':
+        setScheduleType(value as string);
+        break;
+      case 'technician':
+        setSelectedTechnician(value as string);
+        break;
+
+      default:
+        break;
+    }
   };
+  const handleDateChange = (date: Dayjs | null) => {
+    setScheduleDate(date);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await axios.post('http://localhost:5000/createSchedule', {
+        scheduleType,
+        storeId: selectedStore,
+        technicianId: selectedTechnician,
+        scheduleDate: scheduleDate
+      })
+    } catch (error) {
+      console.error('Error scheduling:', error);
+    }
+
+    fetchSchedule();
+  }
   return (
     <div>
       <h1 className="text-2xl font-semibold ">Schedule</h1>
@@ -215,12 +218,12 @@ console.log(selectedTechnician)
                 value={selectedStore}
                 onChange={handleChange}
               >
-                {stores
-                .map((store)=>(
-                  <MenuItem key={store._id} value={store._id}>
-                    {store.name}
-                  </MenuItem>
-                ))}
+                {filterdStores
+                  .map((store) => (
+                    <MenuItem key={store._id} value={store._id}>
+                      {store.name}
+                    </MenuItem>
+                  ))}
               </StyledSelect>
             </FormControl>
           </Grid>
@@ -266,15 +269,15 @@ console.log(selectedTechnician)
                 <StyledDatePicker
                   name='scheduleDate'
                   value={scheduleDate}
-                
-                  >
+                  onChange={handleDateChange}
+                >
 
                 </StyledDatePicker>
               </LocalizationProvider>
             </FormControl>
           </Grid>
           <Grid size={3}>
-            <Button variant="contained" color="primary" sx={{ height: '40px', fontSize: '0.875rem' }}>
+            <Button variant="contained" color="primary" sx={{ height: '40px', fontSize: '0.875rem' }} onClick={handleSubmit}>
               Schedule
             </Button>
           </Grid>
@@ -288,7 +291,7 @@ console.log(selectedTechnician)
         </Grid>
 
         <Box sx={{ height: 400, width: '100%', mt: 2 }}>
-          <DataGrid columns={columns} rows={rows}></DataGrid>
+          <DataGrid columns={columns} rows={schedule} getRowId={(row) => row._id} ></DataGrid>
         </Box>
       </Container>
     </div>

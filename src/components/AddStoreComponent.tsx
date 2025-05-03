@@ -30,6 +30,7 @@ interface StoreManager{
 const Columnns = [
     { field: 'clientName', headerName: 'Client Name',width:140},
     { field: 'name', headerName: 'Store Name' ,width:140},
+    {field:'storeCode',headerName:'Store Code',width:140},
     { field: 'address', headerName: 'Address' ,width:140},
     { field: 'zipcode', headerName: 'Zipcode' ,width:140},
 
