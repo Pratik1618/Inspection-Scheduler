@@ -1,6 +1,6 @@
 import { Box, Button, Container, Grid } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { StyledTextField } from '../components/styledComponents'
+import { StyledTextField } from './styledComponents'
 import { DataGrid } from '@mui/x-data-grid'
 import axios from 'axios'
 import api from '../constant/server'
@@ -22,7 +22,7 @@ const Columns = [
         }
     }
 ]
-const AddClient: React.FC = () => {
+const AddClientComponent: React.FC = () => {
 const url = api().baseUrl
     function maxNum(arr){
         let max = arr[0];
@@ -151,4 +151,4 @@ console.log(anagaram('oppo','poop'));
     )
 }
 
-export default AddClient
+export default AddClientComponent;

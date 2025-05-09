@@ -4,10 +4,12 @@ import { Route, BrowserRouter as Router, Routes, useLocation, useNavigate } from
 import MainContent from "./MainContent";
 import AddUser from "./pages/AddUser";
 import Schedule from "./components/ScheduleComponent";
-import AddClient from "./pages/AddClient";
+
 import Login from "./pages/Login";
 import { jwtDecode } from 'jwt-decode'
 import AddStore from "./pages/AddStore";
+import Client from "./pages/Client";
+import AdminFormControl from "./components/Forms/AdminFormControl";
 const App = () => {
   const [open, setOpen] = useState(true);
   const [selectedTile, setSelectedTile] = useState("Home Page");
@@ -23,7 +25,7 @@ const App = () => {
     {title:"Store",src:"Store",path:"/store"},
 
     { title: "Search", src: "Search" },
-    { title: "Analytics", src: "Chart" },
+    { title: "Analytics", src: "Chart" ,path:'/formControl'},
     { title: "Files ", src: "Folder", gap: true },
     { title: "Setting", src: "Setting" },
     { title: "Inspection", src: "Inspection", path: "/inspection" }, // New tab for Technician
@@ -134,8 +136,9 @@ const App = () => {
             <Routes>
               <Route path="/schedule" element={<Schedule />} />
               <Route path="/users" element={<AddUser />} />
-              <Route path="/clients" element={<AddClient />} />
+              <Route path="/clients" element={<Client />} />
               <Route path="/store" element={<AddStore />} />
+              <Route path="/formControl" element={<AdminFormControl/>} />
               <Route path="/" element={<h1>Welcome to Dashboard</h1>} />
 
             </Routes>

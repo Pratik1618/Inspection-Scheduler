@@ -7,15 +7,11 @@ import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import axios from 'axios';
 import { StyledDatePicker, StyledInputLabel, StyledSelect } from './styledComponents';
-import store from '../../../Scheduler-Backend/model/store';
 import dayjs, { Dayjs } from 'dayjs';
-import { set } from 'mongoose';
-import { Store } from 'lucide-react';
 import api from '../constant/server';
 
 const columns = [
   { field: 'ticketNo', headerName: 'Ticket No', width: 120 },
-
   { field: 'clientName', headerName: 'Client', width: 150 },
   { field: 'storeName', headerName: 'Store Name', width: 200 },
   { field: 'storeCode', headerName: 'Store Code', width: 150 },
@@ -53,7 +49,6 @@ interface ScheduleFor {
 
 interface RowData {
   id: number;
-  zone: string;
   ClientName: string;
   StoreName: string;
   StoreCode: string;
@@ -73,8 +68,6 @@ const scheduleFor: ScheduleFor[] = [
   { value: 'installation', label: 'Installation' },
 
 ]
-
-
 
 
 const ScheduleComponent: React.FC = () => {
@@ -112,17 +105,12 @@ const ScheduleComponent: React.FC = () => {
         const storeResponse = await axios.get(`${url}/stores`);
         setStores(storeResponse.data)
 
-
-
-
       } catch (error) {
         console.error('Error fetching clients or stores:', error);
       }
     };
 
     console.log(stores, 'stores')
-
-
     fetchSchedule();
     fetchTechnicians();
     fetchClientsAndStores();
