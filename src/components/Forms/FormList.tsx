@@ -32,7 +32,7 @@ const FormList:React.FC = () => {
         {forms.map((form) => (
 
         
-        <Card key={form.id} >
+        <Card key={form.id} variant='outlined' sx={{borderRadius:2}} >
             <CardContent sx={{paddingTop:2}}>
                 <div>
                     <h3 className='font-medium text-lg'>{form.name}</h3>
@@ -43,7 +43,7 @@ const FormList:React.FC = () => {
 
                 </div>
             </CardContent>
-            <CardActions sx={{ display:'flex',justifyContent:'space-between',gap:2}}>
+            <CardActions sx={{ display:'flex',justifyContent:'space-between',gap:2 ,p:2}}>
                 <Button variant='outlined'  sx={{borderRadius:'6px' , color:'black' ,borderColor:'black',}}>
                     <ExternalLink className='mr-1 h-4 w-4'/>
               Preview
