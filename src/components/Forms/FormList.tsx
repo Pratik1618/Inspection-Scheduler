@@ -44,12 +44,12 @@ const FormList:React.FC = () => {
                 </div>
             </CardContent>
             <CardActions sx={{ display:'flex',justifyContent:'space-between',gap:2 ,p:2}}>
-                <Button variant='outlined'  sx={{borderRadius:'6px' , color:'black' ,borderColor:'black',}}>
+                <Button variant='outlined'  sx={{borderRadius:'6px' , color:'black' ,borderColor:'black',textTransform:'none'}}>
                     <ExternalLink className='mr-1 h-4 w-4'/>
               Preview
                     
                 </Button>
-                <Button sx={{backgroundColor:'#f44336',color:'white' ,borderRadius:'6px', }}>
+                <Button sx={{backgroundColor:'#f44336',color:'white' ,borderRadius:'6px', textTransform:'none' }}>
                     <Trash2 className='mr-1 h-4 w-4'/>
                 Delete
                     

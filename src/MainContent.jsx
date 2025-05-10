@@ -21,7 +21,9 @@ const MainContent = ({ children, sidebarOpen }) => {
         right: '24px', // Right margin added here
         top:0,
         bottom:0,
-        overflowY: 'hidden',
+        overflowY: 'scroll',
+        scrollbarWidth:'none',
+        
         transition: 'margin-left 0.9s cubic-bezier(0.4, 0, 0.2, 1)',
       
        
