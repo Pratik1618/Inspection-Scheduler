@@ -67,6 +67,7 @@ const FormBuilder: React.FC = () => {
                                             <Typography>Field Type</Typography>
                                             <Select fullWidth size='small'
                                                 value={field.type}
+                                                sx={{borderRadius:2,...textfieldStyle}}
                                                 onChange={(event) => {
                                                     const newType = event.target.value;
                                                     updateField(field.id, {
@@ -139,6 +140,7 @@ const FormBuilder: React.FC = () => {
                 <Button type='button'   fullWidth sx={{color:'white',backgroundColor:'black',borderRadius:2}}>
                     <Save className='h-4 w-4 mr-2'/> Save Form
                 </Button>
+               
             </div>
 
         </div>
