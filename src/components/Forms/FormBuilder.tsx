@@ -11,12 +11,20 @@ const FIELD_TYPES = [
 ]
 import { ExternalLink, Trash2, Plus, MoveUp, MoveDown, Save } from 'lucide-react'
 import { textfieldStyle } from '../../constant/style'
+import axios from 'axios'
+import api from '../../constant/server'
 
 const FormBuilder: React.FC = () => {
+    const [formTitle, setFormTitle] = useState("")
+    const [formDescription, setFormDescription] = useState("")
+     const [errorMessage, setErrorMessage] = useState<string | null>(null); // Error message state
+      const [openSnackbar, setOpenSnackbar] = useState(false);
+
     const [fields, setFields] = useState<any[]>([
         { id: "1", type: "text", label: "Name", placeholder: "Enter your name", required: true, options: [] },
     ])
 
+    const url = api().baseUrl
 
     const addField = () => {
         const newId = String(fields.length + 1)
@@ -92,26 +100,47 @@ const FormBuilder: React.FC = () => {
             }),
         )
     }
+
+    const saveForm = async ()=>{
+        const form ={
+            title:formTitle,
+            description:formDescription,
+            fields
+        }
+        try{
+            const response = await axios.post(`${url}/addForm`,form)
+            if(response.status === 201){
+                setErrorMessage(response.data.message)
+            }
+        }
+        catch(error:any){
+            console.log(error,'error');
+            setErrorMessage(error.response.data.message || 'An error occurred')
+      setOpenSnackbar(true)
+        }
+    }
     return (
         <div className='space-y-6'>
             <div className='space-y-4'>
                 <div>
-                    <Typography >Form Title</Typography>
+                    <Typography component="label" htmlFor='form-title' >Form Title</Typography>
                     <TextField
                         variant='outlined'
                         size='small'
                         fullWidth
                         sx={textfieldStyle}
+                        onChange={(e) => setFormTitle(e.target.value)}
                         id='form-title'
                         placeholder='Enter Form Title' />
 
                 </div>
                 <div>
-                    <Typography>Description (optional)</Typography>
+                    <Typography component='label' htmlFor='form-description'>Description (optional)</Typography>
                     <TextField
                         fullWidth
                         variant='outlined'
                         id='form-description'
+                        onChange={(e) => setFormDescription(e.target.value)}
                         sx={textfieldStyle}
                         placeholder='Enter form description'
                         minRows={3}
@@ -131,12 +160,13 @@ const FormBuilder: React.FC = () => {
                                             <Typography component='label' htmlFor={`field-${field.id}-label`}> Field Label</Typography>
                                             <TextField variant='outlined' id={`field-${field.id}-label`}
                                                 value={field.label}
+
                                                 sx={textfieldStyle}
                                                 onChange={(e) => updateField(field.id, { label: e.target.value })}
                                                 fullWidth size='small' />
                                         </div>
                                         <div>
-                                            <Typography>Field Type</Typography>
+                                            <Typography component='label' htmlFor={`field-${field.id}-type`}>Field Type</Typography>
                                             <Select fullWidth size='small'
                                                 value={field.type}
                                                 sx={{ borderRadius: 2, ...textfieldStyle }}
@@ -166,8 +196,11 @@ const FormBuilder: React.FC = () => {
                                         field.type === "email") && (
                                             <div>
 
-                                                <Typography>Placeholder</Typography>
-                                                <TextField variant='outlined' fullWidth sx={textfieldStyle} />
+                                                <Typography component='label' htmlFor={`field-${field.id}-placeholder`} >Placeholder</Typography>
+                                                <TextField variant='outlined'
+                                                    fullWidth sx={textfieldStyle}
+                                                    value={field.placeholder || ''}
+                                                    onChange={(e) => updateField(field.id, { placeholder: e.target.value })} />
                                             </div>)}
                                     {(field.type === 'select' || field.type === 'radio') && (
                                         <div className='space-y-2'>
@@ -210,7 +243,7 @@ const FormBuilder: React.FC = () => {
                                         </div>
                                     )}
                                     <div className='flex items-center space-x-2 '>
-                                        <FormControlLabel control={<Switch />} label='Required Field' />
+                                        <FormControlLabel control={<Switch checked={field.required} onChange={(e) => updateField(field.id, { required: e.target.checked })} />} label='Required Field' />
 
                                     </div>
                                     <div className='flex justify-between'>
@@ -239,7 +272,7 @@ const FormBuilder: React.FC = () => {
                         <Plus className='h-4 w-4 mr-2' />Add Field
                     </Button>
                 </div>
-                <Button type='button' fullWidth sx={{ color: 'white', backgroundColor: 'black', borderRadius: 2 }}>
+                <Button type='button' fullWidth sx={{ color: 'white', backgroundColor: 'black', borderRadius: 2 }} onClick={saveForm}>
                     <Save className='h-4 w-4 mr-2' /> Save Form
                 </Button>
 
