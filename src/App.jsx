@@ -10,6 +10,7 @@ import { jwtDecode } from 'jwt-decode'
 import AddStore from "./pages/AddStore";
 import Client from "./pages/Client";
 import AdminFormControl from "./components/Forms/AdminFormControl";
+import FormPreview from "./components/Forms/FormPreview";
 const App = () => {
   const [open, setOpen] = useState(true);
   const [selectedTile, setSelectedTile] = useState("Home Page");
@@ -139,6 +140,7 @@ const App = () => {
               <Route path="/clients" element={<Client />} />
               <Route path="/store" element={<AddStore />} />
               <Route path="/formControl" element={<AdminFormControl/>} />
+            <Route path="/form-preview/:formId" element={<FormPreview/>} />
               <Route path="/" element={<h1>Welcome to Dashboard</h1>} />
 
             </Routes>

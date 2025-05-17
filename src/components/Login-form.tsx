@@ -95,6 +95,7 @@ export default function LoginForm() {
               name="password"
               value={password}
               onChange={handleChange}
+              autoComplete="off"
               
             />
             <button

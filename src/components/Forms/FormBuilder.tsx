@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, FormControlLabel, IconButton, Input, MenuItem, Select, Switch, TextareaAutosize, TextField, Typography } from '@mui/material'
+import { Button, Card, CardContent, FormControlLabel, IconButton, Input, MenuItem, Select, Snackbar, Switch, TextareaAutosize, TextField, Typography } from '@mui/material'
 import React, { useState } from 'react'
 const FIELD_TYPES = [
     { value: "text", label: "Text" },
@@ -17,8 +17,8 @@ import api from '../../constant/server'
 const FormBuilder: React.FC = () => {
     const [formTitle, setFormTitle] = useState("")
     const [formDescription, setFormDescription] = useState("")
-     const [errorMessage, setErrorMessage] = useState<string | null>(null); // Error message state
-      const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null); // Error message state
+    const [openSnackbar, setOpenSnackbar] = useState(false);
 
     const [fields, setFields] = useState<any[]>([
         { id: "1", type: "text", label: "Name", placeholder: "Enter your name", required: true, options: [] },
@@ -101,24 +101,31 @@ const FormBuilder: React.FC = () => {
         )
     }
 
-    const saveForm = async ()=>{
-        const form ={
-            title:formTitle,
-            description:formDescription,
+    const saveForm = async () => {
+        const form = {
+            title: formTitle,
+            description: formDescription,
             fields
         }
-        try{
-            const response = await axios.post(`${url}/addForm`,form)
-            if(response.status === 201){
+        try {
+            const response = await axios.post(`${url}/addForm`, form)
+            if (response.status === 201) {
                 setErrorMessage(response.data.message)
+                setOpenSnackbar(true)
+                setFormTitle("");
+                setFormDescription("");
+                setFields([{ id: "1", type: "text", label: "Name", placeholder: "Enter your name", required: true, options: [] }]);
             }
         }
-        catch(error:any){
-            console.log(error,'error');
+        catch (error: any) {
+            console.log(error, 'error');
             setErrorMessage(error.response.data.message || 'An error occurred')
-      setOpenSnackbar(true)
+            setOpenSnackbar(true)
         }
     }
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+    };
     return (
         <div className='space-y-6'>
             <div className='space-y-4'>
@@ -277,8 +284,15 @@ const FormBuilder: React.FC = () => {
                 </Button>
 
             </div>
-
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+                message={errorMessage}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            />
         </div>
+
     )
 }
 
