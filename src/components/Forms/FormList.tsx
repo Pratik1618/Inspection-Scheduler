@@ -38,7 +38,7 @@ const FormList:React.FC = () => {
                 </div>
             </CardContent>
             <CardActions sx={{ display:'flex',justifyContent:'space-between',gap:2 ,p:2}}>
-                <Link to ={`/form-preview/Z${form._id}`} >
+                <Link to ={`/form-preview/${form._id}`} >
                 <Button variant='outlined'  sx={{borderRadius:'6px' , color:'black' ,borderColor:'black',textTransform:'none'}}>
                     <ExternalLink className='mr-1 h-4 w-4'/>
               Preview
